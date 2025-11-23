@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aipatch"
+version = "0.1.4"
+description = "CLI tool for gathering file context and applying LLM patches"
+dependencies = [
+    "pyperclip",
+]
+requires-python = ">=3.7"
+
+[project.scripts]
+aipatch = "aipatch.main:main"
