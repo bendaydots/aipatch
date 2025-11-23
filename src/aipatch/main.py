@@ -336,6 +336,73 @@ def run_pbpaste(args):
     sys.stdout.write(content)
 
 
+# --- Subcommand: LAST ---
+
+def run_last(args):
+    report_path = os.path.join(AIPATCH_DIR, "last_run.json")
+    if not os.path.exists(report_path):
+        print(f"[ERROR] No report found at {report_path}", file=sys.stderr)
+        sys.exit(1)
+
+    with open(report_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    failures = data.get("failures", [])
+    mode = args.mode
+
+    if mode == "list":
+        # Just list the status
+        print(f"Report from: {data.get('timestamp')}")
+        print(f"Applied: {data.get('stats', {}).get('applied', 0)}")
+        print(f"Failed:  {len(failures)}")
+        if failures:
+            print("\nFailures:")
+            for fail in failures:
+                p_str = f" [{fail['project']}]" if fail.get('project') else ""
+                print(f"  - {fail['file']}: {fail['reason']}{p_str}")
+
+    elif mode == "fix":
+        # Generate prompt to FIX
+        if not failures:
+            print("No failures to fix.")
+            return
+
+        print("The following patches failed to apply. Please FIX the SEARCH blocks.\n")
+        for fail in failures:
+            path = fail['file']
+            reason = fail['reason']
+            project = fail.get('project')
+            raw_block = fail['block']
+
+            p_header = f" (project: {project})" if project else ""
+            print(f"File: {path}{p_header}")
+            print(f"Error: {reason}")
+            print(f"Attempted Patch:\n{raw_block}")
+
+            if os.path.exists(path):
+                with open(path, "r", encoding="utf-8", errors="replace") as f:
+                    content = f.read()
+                print(f"Current File Content:\n{SEPARATOR}\n{content}\n{SEPARATOR}\n")
+            else:
+                print("Current File Content: (File does not exist)\n")
+
+    elif mode == "why":
+        # Generate prompt to ANALYZE
+        if not failures:
+            print("No failures to analyze.")
+            return
+
+        print("The following patches failed. Please ANALYZE why.\n")
+        print("Check for:\n1. Lazy comments (e.g. // ...)\n2. Indentation mismatch (Tabs vs Spaces)\n3. Patch already applied\n4. Incorrect context matching\n")
+        for fail in failures:
+            path = fail['file']
+            reason = fail['reason']
+            raw_block = fail['block']
+            print(f"File: {path}")
+            print(f"Error: {reason}")
+            print(f"Block:\n{raw_block}\n")
+
+
 # --- Subcommand: HELP ---
 
 def run_help(args):
@@ -408,6 +475,12 @@ def main():
     # 'pbpaste' command
     parser_pbpaste = subparsers.add_parser("pbpaste", help="Print clipboard content to stdout.")
     parser_pbpaste.set_defaults(func=run_pbpaste)
+
+    # 'last' command
+    parser_last = subparsers.add_parser("last", help="Query the last patch run (requires last_run.json).")
+    parser_last.add_argument("mode", nargs="?", choices=["list", "fix", "why"], default="list",
+                             help="list: Show summary (default). fix: Gen prompt to fix. why: Gen prompt to analyze.")
+    parser_last.set_defaults(func=run_last)
 
     # 'help' command
     parser_help = subparsers.add_parser("help", help="Show detailed help and usage.")
