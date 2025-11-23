@@ -30,7 +30,7 @@ Every *SEARCH/REPLACE block* must use this exact 8-part format:
     - `````project: android
     - ````` android
 
-2.  **The FULL file path** alone on the next line, verbatim. Do not use quotes, bolding, or character escaping.
+2.  **The FULL file path** alone on the next line, verbatim. Do not use quotes, bolding, or character escaping. Use exactly what is written in the File: line. DO NOT prepend the project name as a directory unless it is explicitly part of the provided path.
 
 3.  The start of the search block: `<<<<<<< SEARCH`
 
