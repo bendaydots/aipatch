@@ -2,6 +2,19 @@
 
 `aipatch` is a CLI tool designed to streamline the "Context Gathering -> LLM Prompting -> Code Application" loop. It formats codebases for LLMs and applies the structured responses back to your files.
 
+## Installation
+
+```bash
+# Standard pip
+pip install --upgrade aipatch
+
+# pipx (Recommended)
+pipx install aipatch
+
+# uv
+uvx aipatch --help
+```
+
 ## Workflow
 
 ### 1. Gather Context (The Prompt)
