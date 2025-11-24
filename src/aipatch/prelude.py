@@ -1,3 +1,150 @@
+
+
+FIX_TEXT = r"""
+
+
+
+-----===-----
+
+
+# Task: Fix and Regenerate Failed Patches
+
+You are receiving **Source Files** and **Failed Patches**. Your goal is to correct the errors in the patches so they apply successfully.
+
+## 1. Diagnosis & Correction Strategy
+To fix the patches, you must address the following common failure points:
+
+*   **Fix Lazy Matching:** If the failed patch used `// ...` or comments to skip code in the `SEARCH` block, you must replace that with the **actual, full code** from the source file.
+*   **Fix Indentation:** The `SEARCH` block must exactly match the source file's indentation (Tabs vs. Spaces).
+*   **Fix Context:** Ensure the `SEARCH` block is unique enough to locate the specific section but minimal enough to reduce conflicts.
+*   **Fix Format:** Ensure the output strictly adheres to the 8-part `*SEARCH/REPLACE*` format defined below.
+
+## 2. The Strict `*SEARCH/REPLACE*` Format Specification
+
+You must output your corrected patches using **only** this format. Do not use standard Diff or Git patch formats.
+
+**The 8-Part Structure:**
+Every block must follow this sequence exactly:
+
+1.  **Opening Fence:** Five backticks (`````) followed immediately by the context identifier (e.g., `````backend).
+    *   *Rule:* If the file input provided a project name (e.g., `(project: my_project)`), use `my_project`. If not, use a simple identifier like `main`.
+2.  **File Path:** The full file path on the next line (verbatim, no quotes).
+3.  **Search Marker:** `<<<<<<< SEARCH`
+4.  **Search Content:** A contiguous chunk of lines that **EXACTLY MATCHES** the provided source code (character-for-character).
+5.  **Divider:** `=======`
+6.  **Replace Content:** The corrected code you wish to insert.
+7.  **End Marker:** `>>>>>>> REPLACE`
+8.  **Closing Fence:** `````
+
+**Example:**
+`````backend
+server/main.go
+<<<<<<< SEARCH
+func main() {
+    fmt.Println("Starting server...")
+}
+=======
+func main() {
+    fmt.Println("Starting server v2...")
+    initDB()
+}
+>>>>>>> REPLACE
+`````
+
+## 3. Special Operations
+
+*   **New Files:** To create a file that failed to be created, use an empty `SEARCH` section.
+*   **Deletions:** To delete code, use an empty `REPLACE` section.
+*   **Mandatory Summary:** At the very end of your response, you **MUST** generate a summary file block.
+
+## 4. The Mandatory Summary Block
+After fixing all code patches, append this specific block to update the summary:
+
+`````aipatch_summary
+.aipatch/LAST-SUMMARY.md
+<<<<<<< SEARCH
+=======
+- [Fixed] Corrected indentation for `filename.ext`.
+- [Fixed] Expanded lazy comments in `otherfile.ext`.
+- [Applied] Successfully applied the intended logic change to `functionName`.
+>>>>>>> REPLACE
+`````
+
+---
+
+**Instruction:** analyzing the provided source code and the failed intent, output the **Corrected** `*SEARCH/REPLACE*` blocks now.
+
+
+-----===-----
+
+
+"""
+
+
+
+ANALYZE_TEXT = r"""
+
+
+
+-----===-----
+
+
+# Code Patch Analysis & Diagnosis
+
+Your primary task is to analyze why specific code patches failed to apply. You are acting as a debugger for the patching process.
+
+## Part 1: Analysis Checklist
+Please examine the provided code and the failed patches. **ANALYZE** the failure by checking for the following common errors:
+
+1.  **Lazy Comments/Ellipses:** Did the patch use `// ...` or `# ...` instead of writing out the full code lines? This causes match failures.
+2.  **Indentation Mismatch:** Check strictly for Tabs vs. Spaces. The patch must match the file's existing indentation exactly.
+3.  **Patch Already Applied:** Has the change already been made in the source code?
+4.  **Incorrect Context Matching:** Does the `SEARCH` block match the existing file content character-for-character (including whitespace and docstrings)?
+5.  **Format Violations:** Did the patch violate the strict formatting rules (incorrect fences, wrong file path format, etc.)?
+
+## Part 2: The Reference Format
+To analyze the failures correctly, you must understand the strict protocol that was used to generate these patches. Use the following rules as the "Standard" against which you judge the failed patches.
+
+### The `*SEARCH/REPLACE*` Standard used:
+
+**1. Fence and Context Identifier**
+*   The patch must start with five backticks (`````).
+*   If a project name was provided (e.g., `(project: backend)`), that name must be the context identifier (e.g., `````backend).
+*   It must NOT use prefixes like `project:`.
+
+**2. File Path**
+*   The full file path must be on the line immediately following the opening fence.
+*   It must be verbatim, with no quotes or formatting.
+
+**3. Search/Replace Structure**
+Every block must use this exact 8-part structure:
+1.  Opening fence: `````context_id
+2.  File path
+3.  `<<<<<<< SEARCH`
+4.  **Existing Code:** A contiguous chunk of lines to search for.
+5.  `=======`
+6.  **Replacement Code:** The lines to replace the searched-for code.
+7.  `>>>>>>> REPLACE`
+8.  Closing fence: `````
+
+### Guiding Principles for Analysis
+*   **Exact Matching:** The `SEARCH` section must *EXACTLY MATCH* the existing file content.
+*   **First Match Only:** The patch acts on the *first* occurrence of the text.
+*   **Empty Sections:**
+    *   **New Files:** Should have had an empty `SEARCH` section.
+    *   **Deletions/Moves:** Might have an empty `REPLACE` section (for the delete step).
+
+### Mandatory Summary Check
+*   The patch generation protocol required a summary file at `.aipatch/LAST-SUMMARY.md`. If the failure is related to missing this file, note it.
+
+
+-----===-----
+
+
+
+"""
+
+
 PRELUDE_TEXT = r"""
 
 
@@ -30,7 +177,7 @@ Every *SEARCH/REPLACE block* must use this exact 8-part format:
     - `````project: android
     - ````` android
 
-2.  **The FULL file path** alone on the next line, verbatim. Do not use quotes, bolding, or character escaping. Use exactly what is written in the File: line. DO NOT prepend the project name as a directory unless it is explicitly part of the provided path.
+2.  **The FULL file path** alone on the next line, verbatim. Do not use quotes, bolding, or character escaping. 
 
 3.  The start of the search block: `<<<<<<< SEARCH`
 

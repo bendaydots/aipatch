@@ -373,7 +373,8 @@ def run_last(args):
             print("No failures to fix.")
             return
 
-        print("The following patches failed to apply. Please FIX the SEARCH blocks.\n")
+        print(prelude.FIX_TEXT)
+        printed_files = set()
         for fail in failures:
             path = fail['file']
             reason = fail['reason']
@@ -385,12 +386,16 @@ def run_last(args):
             print(f"Error: {reason}")
             print(f"Attempted Patch:\n{raw_block}")
 
-            if os.path.exists(path):
-                with open(path, "r", encoding="utf-8", errors="replace") as f:
-                    content = f.read()
-                print(f"Current File Content:\n{SEPARATOR}\n{content}\n{SEPARATOR}\n")
+            if path not in printed_files:
+                printed_files.add(path)
+                if os.path.exists(path):
+                    with open(path, "r", encoding="utf-8", errors="replace") as f:
+                        content = f.read()
+                    print(f"Current File Content:\n{SEPARATOR}\n{content}\n{SEPARATOR}\n")
+                else:
+                    print("Current File Content: (File does not exist)\n")
             else:
-                print("Current File Content: (File does not exist)\n")
+                print("(File content already displayed above)\n")
 
     elif mode == "why":
         # Generate prompt to ANALYZE
@@ -398,15 +403,29 @@ def run_last(args):
             print("No failures to analyze.")
             return
 
-        print("The following patches failed. Please ANALYZE why.\n")
-        print("Check for:\n1. Lazy comments (e.g. // ...)\n2. Indentation mismatch (Tabs vs Spaces)\n3. Patch already applied\n4. Incorrect context matching\n")
+        print(prelude.ANALYZE_TEXT)
+        printed_files = set()
         for fail in failures:
             path = fail['file']
             reason = fail['reason']
+            project = fail.get('project')
             raw_block = fail['block']
-            print(f"File: {path}")
+
+            p_header = f" (project: {project})" if project else ""
+            print(f"File: {path}{p_header}")
             print(f"Error: {reason}")
-            print(f"Block:\n{raw_block}\n")
+            print(f"Block:\n{raw_block}")
+
+            if path not in printed_files:
+                printed_files.add(path)
+                if os.path.exists(path):
+                    with open(path, "r", encoding="utf-8", errors="replace") as f:
+                        content = f.read()
+                    print(f"Current File Content:\n{SEPARATOR}\n{content}\n{SEPARATOR}\n")
+                else:
+                    print("Current File Content: (File does not exist)\n")
+            else:
+                print("(File content already displayed above)\n")
 
 
 # --- Subcommand: VERSION ---
