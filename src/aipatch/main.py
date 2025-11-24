@@ -409,6 +409,34 @@ def run_last(args):
             print(f"Block:\n{raw_block}\n")
 
 
+# --- Subcommand: VERSION ---
+
+def run_version(args):
+    try:
+        from importlib.metadata import version
+        print(version("aipatch"))
+        return
+    except Exception:
+        pass
+
+    d = os.getcwd()
+    while True:
+        p = os.path.join(d, "pyproject.toml")
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                for line in f:
+                    m = re.match(r'^\s*version\s*=\s*["\']([^"\']+)["\']', line)
+                    if m:
+                        print(m.group(1))
+                        return
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+
+    print("unknown")
+
+
 # --- Subcommand: HELP ---
 
 def run_help(args):
@@ -445,6 +473,9 @@ Commands:
 
   pbpaste
       Utility to print system clipboard content to stdout.
+
+  version
+      Show version information.
 
   help
       Show this help message.
@@ -487,6 +518,10 @@ def main():
     parser_last.add_argument("mode", nargs="?", choices=["list", "fix", "why"], default="list",
                              help="list: Show summary (default). fix: Gen prompt to fix. why: Gen prompt to analyze.")
     parser_last.set_defaults(func=run_last)
+
+    # 'version' command
+    parser_version = subparsers.add_parser("version", help="Show version information.")
+    parser_version.set_defaults(func=run_version)
 
     # 'help' command
     parser_help = subparsers.add_parser("help", help="Show detailed help and usage.")
