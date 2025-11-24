@@ -256,13 +256,19 @@ def run_patch(args):
     ts = _ensure_aipatch_and_log_input(data)
     report = RunReport(ts)
 
-    edits = parse_blocks(data, args.project)
-    if not edits:
-        print("[ERROR] No edits found", file=sys.stderr)
-        sys.exit(1)
+    applied_count = 0
+    applied_files = []
 
-    applied_count, applied_files = apply_edits(edits, report=report)
-    report_path = report.save()
+    try:
+        edits = parse_blocks(data, args.project)
+        if not edits:
+            print("[ERROR] No edits found", file=sys.stderr)
+            sys.exit(1)
+
+        applied_count, applied_files = apply_edits(edits, report=report)
+
+    finally:
+        report_path = report.save()
 
     if applied_count == 0:
         print(f"[ERROR] No edits applied. See report: {report_path}", file=sys.stderr)
