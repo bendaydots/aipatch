@@ -4,12 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aipatch"
-version = "0.1.10"
+version = "0.1.11"
 description = "CLI tool for gathering file context and applying LLM patches"
 dependencies = [
     "pyperclip",
 ]
 requires-python = ">=3.7"
+
+license = "LicenseRef-FRL"
+license-files = ["LICENSE"]
+
+
+[project.urls]
+Repository = "https://github.com/bendaydots/aipatch"
 
 [project.scripts]
 aipatch = "aipatch.main:main"
