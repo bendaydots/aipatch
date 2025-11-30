@@ -2,6 +2,32 @@
 
 `aipatch` is a CLI tool designed to streamline the "Context Gathering -> LLM Prompting -> Code Application" loop. It formats codebases for LLMs and applies the structured responses back to your files.
 
+## Why aipatch?
+Most AI coding tools (Cursor, aider, Gemini CLI, Copilot Edits) automate patching,  
+but they give you **very little control** over what context is actually sent to the LLM.  
+If the context is missing → the LLM makes wrong assumptions.  
+If the context is bloated → the LLM breaks the SEARCH/REPLACE formatting.
+
+**aipatch solves this by letting you manually control the exact context**  
+while still automating 90% of the workflow.
+
+Key reasons to use it:
+
+- You decide exactly which files enter the LLM prompt.
+- You can combine multiple repositories, languages, and commits into a single mega-prompt.
+- You can edit backend + frontend + docs + mobile in one LLM pass.
+- You avoid the endless “fix your patch” loop common in automated tools.
+
+## Features at a glance
+- **Multi-project prompting** using project IDs (`backend`, `web`, `docs`, `android`)
+- Build **mega-prompts up to 1M tokens** (Google AI Studio / Gemini)
+- Full-stack feature development: backend + frontend + docs + mobile in one pass
+- Cross-language editing (Go → Kotlin, Python → TS, etc.)
+- Commit-to-commit debugging via LLM context
+- Deterministic SEARCH/REPLACE patching with diagnostics
+- Editor-independent workflow (pure CLI)
+- Works with any LLM (ChatGPT, Claude, Gemini, local models)
+
 ## Installation
 
 ```bash
@@ -14,6 +40,31 @@ pipx install aipatch
 # uv
 uvx aipatch --help
 ```
+
+## Multi-Project Prompting (Unique Feature)
+
+Unlike other AI coding tools that only operate inside a single repository,  
+**aipatch can collect context from multiple projects, languages, and git commits**,  
+merging them into one structured prompt with project IDs.
+
+This enables:
+
+- Editing backend + frontend simultaneously  
+- Updating documentation alongside the code  
+- Porting features between different repos  
+- Cross-language translation (e.g., Go → Kotlin, Python → TS)
+- Using one project as reference architecture for another  
+- Comparing OLD vs NEW git commits in a single prompt  
+- Implementing mobile (Android/iOS) clients based on backend + frontend context  
+
+Example real-world workflow:
+
+You can ask the LLM:  
+> “Add the new `/user/settings/update` API, update backend, update the web frontend,  
+> update the API documentation, and implement the same API usage in the Android app.”
+
+And `aipatch` provides the context necessary for the LLM  
+to update the **entire stack in one iteration**.
 
 ## Workflow
 
