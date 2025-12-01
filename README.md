@@ -2,7 +2,7 @@
 
 `aipatch` is a CLI tool designed to streamline the "Context Gathering -> LLM Prompting -> Code Application" loop. It formats codebases for LLMs and applies the structured responses back to your files.
 
-[![I improved aipatch Using aipatch](https://img.youtube.com/vi/xho0pMKPu14/maxresdefault.jpg)](https://youtu.be/xho0pMKPu14)
+[![I improved aipatch Using aipatch](media/video-image.jpg)](https://youtu.be/xho0pMKPu14)
 
 ## Why aipatch?
 Most AI coding tools (Cursor, aider, Gemini CLI, Copilot Edits) automate patching,  
