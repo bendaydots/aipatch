@@ -1,21 +1,21 @@
 # aipatch
 
-`aipatch` is a CLI tool designed to streamline the "Context Gathering -> LLM Prompting -> Code Application" loop. It formats codebases for LLMs and applies the structured responses back to your files.
+`aipatch` is a CLI tool designed to streamline the "Context Gathering -> LLM Prompting -> Code Application" loop. It formats codebases for LLMs and applies the structured responses returned to your files.
 
 [![I improved aipatch Using aipatch](media/video-image2.jpg)](https://youtu.be/xho0pMKPu14)
 
 ## Why aipatch?
 Most AI coding tools (Cursor, aider, Gemini CLI, Copilot Edits) automate patching,  
-but they give you **very little control** over what context is actually sent to the LLM.  
-If the context is missing → the LLM makes wrong assumptions.  
-If the context is bloated → the LLM breaks the SEARCH/REPLACE formatting.
+but they give you **very little control** over the context actually sent to the LLM.  
+Without the right content (or with no context), the LLM makes wrong assumptions, which leads compounded mistakes.
+And if the context is bloated, the LLM will break the SEARCH/REPLACE formatting.
 
-**aipatch solves this by letting you manually control the exact context**  
+**aipatch solves this by letting you manually control the exact context** being sent to the LLM 
 while still automating 90% of the workflow.
 
 Key reasons to use it:
 
-- You decide exactly which files enter the LLM prompt.
+- You select exactly which files are sent to the LLM.
 - You can combine multiple repositories, languages, and commits into a single mega-prompt.
 - You can edit backend + frontend + docs + mobile in one LLM pass.
 - You avoid the endless “fix your patch” loop common in automated tools.
@@ -45,7 +45,7 @@ uvx aipatch --help
 
 ## Multi-Project Prompting (Unique Feature)
 
-Unlike other AI coding tools that only operate inside a single repository,  
+Unlike other AI coding tools which only operate inside a single repository,  
 **aipatch can collect context from multiple projects, languages, and git commits**,  
 merging them into one structured prompt with project IDs.
 
@@ -89,7 +89,7 @@ printf "%s\n\n%s\n" "$RULE" "$CODE" | pbcopy
 ```
 
 #### Advanced: Multi-Project Context
-When you need to modify an API and a Frontend simultaneously, you can capture context from different directories and assign them distinct project IDs.
+When you need to modify an API and a frontend simultaneously, you can capture context from different directories and assign them distinct project IDs.
 
 ```bash
 #!/bin/bash
